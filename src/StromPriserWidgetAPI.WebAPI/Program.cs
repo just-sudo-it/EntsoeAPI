@@ -1,3 +1,5 @@
+using StromPriserWidgetAPI.WebAPI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -5,6 +7,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddHostedService<UpdateDbService,UpdateDbService>();
 
 var app = builder.Build();
 

@@ -34,6 +34,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{C78AC8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StromPriserWidgetAPI.WebAPI", "src\StromPriserWidgetAPI.WebAPI\StromPriserWidgetAPI.WebAPI.csproj", "{6F2004DE-1DB8-4553-9EBA-7F80D84D6797}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StromPriserWidgetAPI.Data", "src\StromPriserWidgetAPI.Data\StromPriserWidgetAPI.Data.csproj", "{677C2F74-119F-47CF-BAF3-088993AC8952}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,12 +46,17 @@ Global
 		{6F2004DE-1DB8-4553-9EBA-7F80D84D6797}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F2004DE-1DB8-4553-9EBA-7F80D84D6797}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F2004DE-1DB8-4553-9EBA-7F80D84D6797}.Release|Any CPU.Build.0 = Release|Any CPU
+		{677C2F74-119F-47CF-BAF3-088993AC8952}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{677C2F74-119F-47CF-BAF3-088993AC8952}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{677C2F74-119F-47CF-BAF3-088993AC8952}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{677C2F74-119F-47CF-BAF3-088993AC8952}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6F2004DE-1DB8-4553-9EBA-7F80D84D6797} = {52270E06-D3BB-4B8E-A261-377E460B5FD5}
+		{677C2F74-119F-47CF-BAF3-088993AC8952} = {52270E06-D3BB-4B8E-A261-377E460B5FD5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51F9BF65-6DFB-4A56-AC1C-EA87B6678C8B}
