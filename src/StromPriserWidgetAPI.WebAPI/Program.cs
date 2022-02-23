@@ -8,6 +8,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddHostedService<UpdateDbService>();
 
 var app = builder.Build();

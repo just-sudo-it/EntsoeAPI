@@ -4,16 +4,13 @@ namespace StromPriserWidgetAPI.WebAPI.Controllers
 
   [ApiController]
   [Route("[controller]")]
-  public class WeatherForecastController : ControllerBase
+  public class PricesController : ControllerBase
   {
-    private static readonly string[] Summaries = new[]
-    {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+    private static readonly string[] Summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
 
-    private readonly ILogger<WeatherForecastController> _logger;
+    private readonly ILogger<PricesController> _logger;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+    public PricesController(ILogger<PricesController> logger)
     {
       _logger = logger;
     }
