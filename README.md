@@ -1,3 +1,6 @@
+.NET 6 Web API to expose electricity price data from ENTSO-E public API
+
+
 # Templates - Dotnet
 
 A simple template leveraging [.Config][1] dotfiles submodule  for rapid project deployment. Simply rename Solution.{code-workspace,sln,sln.DotSettings} to your project name and get started! Afterwards, replace this readme with the actual documentation of your project.
