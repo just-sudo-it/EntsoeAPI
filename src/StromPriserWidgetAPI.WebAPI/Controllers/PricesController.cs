@@ -2,27 +2,22 @@ namespace StromPriserWidgetAPI.WebAPI.Controllers
 {
   using Microsoft.AspNetCore.Mvc;
 
+  using StromPriserWidgetAPI.Data.Entities;
+
   [ApiController]
   [Route("[controller]")]
   public class PricesController : ControllerBase
   {
-    private static readonly string[] Summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-
-    private readonly ILogger<PricesController> _logger;
+    private readonly ILogger<PricesController> logger;
 
     public PricesController(ILogger<PricesController> logger)
-    {
-      _logger = logger;
-    }
+      => this.logger = logger;
 
     [HttpGet(Name = "GetWeatherForecast")]
-    public IEnumerable<WeatherForecast> Get()
+    public IEnumerable<ZonePrice> Get()
     {
-      return Enumerable.Range(1, 5).Select(index => new WeatherForecast
+      return Enumerable.Range(1, 5).Select(index => new ZonePrice
       {
-        Date = DateTime.Now.AddDays(index),
-        TemperatureC = Random.Shared.Next(-20, 55),
-        Summary = Summaries[Random.Shared.Next(Summaries.Length)]
       })
       .ToArray();
     }

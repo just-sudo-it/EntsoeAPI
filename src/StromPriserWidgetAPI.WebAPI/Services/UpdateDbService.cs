@@ -1,11 +1,18 @@
 namespace StromPriserWidgetAPI.WebAPI.Services;
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Xml;
+using System.Xml.Serialization;
 
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNetCore.WebUtilities;
 
 using StromPriserWidgetAPI.Data;
+using StromPriserWidgetAPI.Data.Entities;
+using StromPriserWidgetAPI.Models;
 
+[SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background services should not die")]
 public class UpdateDbService : BackgroundService
 {
   private readonly ILogger<UpdateDbService> logger;
@@ -15,7 +22,7 @@ public class UpdateDbService : BackgroundService
   public UpdateDbService(
     ILogger<UpdateDbService> logger,
     IHttpClientFactory httpFactory,
-    [NotNull] IServiceScopeFactory scopeFactory)
+    IServiceScopeFactory scopeFactory)
   {
     this.logger = logger;
     this.httpFactory = httpFactory;
@@ -29,28 +36,27 @@ public class UpdateDbService : BackgroundService
     return Task.CompletedTask;
   }
 
-  [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background service should not die")]
   protected override async Task ExecuteAsync(CancellationToken stoppingToken)
   {
-    try
-    {
-      Log.ServiceStarted(logger, nameof(UpdateDbService));
+    Log.ServiceStarted(logger, nameof(UpdateDbService));
 
-      while (!stoppingToken.IsCancellationRequested)
+    while (!stoppingToken.IsCancellationRequested)
+    {
+      try
       {
         await UpdateDatabase(stoppingToken);
-
-        await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
       }
-    }
-    catch (Exception ex)
-    {
-      Log.ServiceFailed(logger, nameof(UpdateDbService), ex);
+      catch (Exception ex)
+      {
+        Log.ServiceFailed(logger, nameof(UpdateDbService), ex.ToString());
+        await Task.Delay(TimeSpan.FromSeconds(25), stoppingToken);
+      }
     }
   }
 
-  private Task UpdateDatabase(CancellationToken cancellationToken)
+  private async Task UpdateDatabase(CancellationToken cancellationToken)
   {
+    var data = await GetPriceData(new DateTime(2022, 01, 02), new DateTime(2022, 01, 03), ZoneType.NO1, cancellationToken);
     using (var scope = scopeFactory.CreateScope())
     {
       using (var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>())
@@ -58,27 +64,51 @@ public class UpdateDbService : BackgroundService
       }
     }
 
-    return Task.CompletedTask;
-  }
-
-  private async Task GetPriceData(CancellationToken cancellationToken)
-  {
-    using var client = httpFactory.CreateClient();
-    using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/repos/dotnet/AspNetCore.Docs/branches")
-    {
-      Headers = { { HeaderNames.Accept, "application/vnd.github.v3+json" }, { HeaderNames.UserAgent, "HttpRequestsSample" }, },
-    };
-    var httpResponseMessage = await client.SendAsync(httpRequestMessage, cancellationToken);
-
-    if (httpResponseMessage.IsSuccessStatusCode)
-    {
-      using var contentStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
-
-      /*     GitHubBranches = await JsonSerializer.DeserializeAsync
-               <IEnumerable<GitHubBranch>>(contentStream);
-        */
-    }
-
     return;
   }
+
+  private async Task<Publication_MarketDocument?> GetPriceData(DateTime dateFrom, DateTime dateTo, string zone, CancellationToken cancellationToken)
+  {
+    #region
+    // entso api key  "2dac08d6-4c38-4606-8791-c78de794b47d"
+    // entso root api path prod ->"https://transparency.entsoe.eu/api?periodStart=201601010000&periodEnd=201601020000 " dev->"https://iop-transparency.entsoe.eu/api?"
+    using var client = httpFactory.CreateClient();
+
+    var uri = $"https://power.ffail.win/?zone=NO2&date={DateTime.Now:yyyy-MM-dd}&key={Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")}";
+    var uri2 = $"https://power.ffail.win/?zone=NO2&date={DateTime.Now:yyyy-MM-dd}&key={Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")}";
+#endregion
+    using var httpResponseMessage = await client.GetAsync(
+      GetRequestUri(
+        "https://transparency.entsoe.eu/api",
+        new Dictionary<string, string?>()
+        {
+          { "securityToken", "2dac08d6-4c38-4606-8791-c78de794b47d" },
+          { "periodStart", dateFrom.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
+          { "periodEnd", dateTo.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
+          { "documentType", "A44" },
+          { "in_Domain", zone },
+          { "out_Domain", zone },
+          { "processType", "A16" },
+          { "outBiddingZone_Domain", "10YCZ-CEPS-----N" },
+        }),
+      cancellationToken);
+
+    Log.LogInfo(logger, $"{httpResponseMessage.StatusCode} /n {httpResponseMessage.ReasonPhrase}");
+
+    Publication_MarketDocument? data = null;
+    if (httpResponseMessage.IsSuccessStatusCode)
+    {
+      using var inStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
+      using var xmlReader = XmlReader.Create(inStream);
+      data = new XmlSerializer(typeof(Publication_MarketDocument))
+        .Deserialize(xmlReader) as Publication_MarketDocument;
+    }
+
+    return data;
+  }
+
+  private Uri GetRequestUri(string baseUri, IDictionary<string, string?>? @params = null)
+  => @params is null
+     ? new Uri(string.Empty)
+     : new Uri(QueryHelpers.AddQueryString(baseUri, @params));
 }

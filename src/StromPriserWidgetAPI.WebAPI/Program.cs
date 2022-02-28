@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+
+using StromPriserWidgetAPI.Data;
 using StromPriserWidgetAPI.WebAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +14,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<UpdateDbService>();
+
+builder.Services.AddDbContext<DataContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 

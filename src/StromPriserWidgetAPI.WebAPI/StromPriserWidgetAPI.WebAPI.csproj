@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\StromPriserWidgetAPI.Data\StromPriserWidgetAPI.Data.csproj" />
+    <ProjectReference Include="..\StromPriserWidgetAPI.Models\StromPriserWidgetAPI.Models.csproj" />
   </ItemGroup>
 
 </Project>

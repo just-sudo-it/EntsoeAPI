@@ -10,17 +10,16 @@ namespace StromPriserWidgetAPI.Data
 
     public DbSet<string> Prices { get; set; }
 
-    public DataContext(DbContextOptions options)
+    public DataContext(DbContextOptions<DataContext> options)
       : base(options)
     {
     }
 
-
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-      base.OnModelCreating(builder);
+      base.OnModelCreating(modelBuilder);
 
-      Zone.OnModelCreating(builder);
-      ImportTaskEntry.OnModelCreating(builder);
+      ZonePrice.OnModelCreating(modelBuilder);
     }
+  }
 }
