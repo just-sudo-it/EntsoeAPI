@@ -1,6 +1,5 @@
 namespace StromPriserWidgetAPI.WebAPI.Services;
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
@@ -40,6 +39,9 @@ public class UpdateDbService : BackgroundService
   {
     Log.ServiceStarted(logger, nameof(UpdateDbService));
 
+    // Force asynchronous execution due to blocking Hosted Service Pipeline
+    await Task.Yield();
+
     while (!stoppingToken.IsCancellationRequested)
     {
       try
@@ -61,13 +63,14 @@ public class UpdateDbService : BackgroundService
     {
       using (var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>())
       {
+        //persistence code
       }
     }
 
     return;
   }
 
-  private async Task<Publication_MarketDocument?> GetPriceData(DateTime dateFrom, DateTime dateTo, string zone, CancellationToken cancellationToken)
+  private async Task<EntsoeDocument?> GetPriceData(DateTime dateFrom, DateTime dateTo, string zone, CancellationToken cancellationToken)
   {
     #region
     // entso api key  "2dac08d6-4c38-4606-8791-c78de794b47d"
@@ -95,13 +98,13 @@ public class UpdateDbService : BackgroundService
 
     Log.LogInfo(logger, $"{httpResponseMessage.StatusCode} /n {httpResponseMessage.ReasonPhrase}");
 
-    Publication_MarketDocument? data = null;
+    EntsoeDocument? data = null;
     if (httpResponseMessage.IsSuccessStatusCode)
     {
       using var inStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
       using var xmlReader = XmlReader.Create(inStream);
-      data = new XmlSerializer(typeof(Publication_MarketDocument))
-        .Deserialize(xmlReader) as Publication_MarketDocument;
+      data = new XmlSerializer(typeof(EntsoeDocument))
+        .Deserialize(xmlReader) as EntsoeDocument;
     }
 
     return data;
