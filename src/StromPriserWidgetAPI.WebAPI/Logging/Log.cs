@@ -1,4 +1,4 @@
-namespace StromPriserWidgetAPI.WebAPI;
+namespace StromPriserWidgetAPI.WebAPI.Logging;
 
 public static partial class Log
 {
