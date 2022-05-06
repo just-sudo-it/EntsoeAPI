@@ -5,11 +5,13 @@ using System.Globalization;
 using System.Xml;
 using System.Xml.Serialization;
 
+using StromPriserWidgetAPI.Models;
+
 using Microsoft.AspNetCore.WebUtilities;
 
 using StromPriserWidgetAPI.Data;
 using StromPriserWidgetAPI.Data.Entities;
-using StromPriserWidgetAPI.Models;
+using StromPriserWidgetAPI.WebAPI.Logging;
 
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background services should not die")]
 public class UpdateDbService : BackgroundService
@@ -58,13 +60,14 @@ public class UpdateDbService : BackgroundService
 
   private async Task UpdateDatabase(CancellationToken cancellationToken)
   {
-    var data = await GetPriceData(new DateTime(2022, 01, 02), new DateTime(2022, 01, 03), ZoneType.NO1, cancellationToken);
+    var document = await GetPriceData(new DateTime(2022, 01, 02), new DateTime(2022, 01, 03), ZoneType.NO1, cancellationToken);
+
     using (var scope = scopeFactory.CreateScope())
     {
-      using (var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>())
-      {
-        //persistence code
-      }
+      using var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+
+      // persistence code
+
     }
 
     return;
@@ -77,15 +80,16 @@ public class UpdateDbService : BackgroundService
     // entso root api path prod ->"https://transparency.entsoe.eu/api?periodStart=201601010000&periodEnd=201601020000 " dev->"https://iop-transparency.entsoe.eu/api?"
     using var client = httpFactory.CreateClient();
 
-    var uri = $"https://power.ffail.win/?zone=NO2&date={DateTime.Now:yyyy-MM-dd}&key={Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")}";
-    var uri2 = $"https://power.ffail.win/?zone=NO2&date={DateTime.Now:yyyy-MM-dd}&key={Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")}";
-#endregion
+  /*  var prodBaseUri = "https://transparency.entsoe.eu/api" */
+    var devBaseUri = "https://iop-transparency.entsoe.eu/api";
+
+    #endregion
     using var httpResponseMessage = await client.GetAsync(
       GetRequestUri(
-        "https://transparency.entsoe.eu/api",
+        devBaseUri,
         new Dictionary<string, string?>()
         {
-          { "securityToken", "2dac08d6-4c38-4606-8791-c78de794b47d" },
+          { "securityToken", "2dac08d6-4c38-4606-8791-c78de794b47d" }, // {Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")
           { "periodStart", dateFrom.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
           { "periodEnd", dateTo.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
           { "documentType", "A44" },
@@ -110,7 +114,8 @@ public class UpdateDbService : BackgroundService
     return data;
   }
 
-  private Uri GetRequestUri(string baseUri, IDictionary<string, string?>? @params = null)
+  // TODO  transfer to http-utility common class
+  private static Uri GetRequestUri(string baseUri, IDictionary<string, string?>? @params = null)
   => @params is null
      ? new Uri(string.Empty)
      : new Uri(QueryHelpers.AddQueryString(baseUri, @params));

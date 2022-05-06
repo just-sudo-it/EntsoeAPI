@@ -5,10 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 public abstract class StromPriserEntity<TKey, TEntity> : Entity<TKey>
   where TEntity : StromPriserEntity<TKey, TEntity>
 {
-  public override string ToString()
-  {
-    return $"[{GetType().Name}#{Id}]";
-  }
+  public override string ToString() => $"[{GetType().Name}#{Id}]";
 
   internal static void OnModelCreating(EntityTypeBuilder<TEntity> e)
   {

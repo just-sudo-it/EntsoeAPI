@@ -8,8 +8,8 @@ using System.ComponentModel;
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
-[XmlRoot("Publication_MarketDocument", Namespace = "StromPriserWidgetAPI.Models", IsNullable = false)]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
+[XmlRoot("Publication_MarketDocument", Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0", IsNullable = false)]
 public partial class EntsoeDocument
 {
   private string mRIDField;
@@ -23,6 +23,7 @@ public partial class EntsoeDocument
   private PeriodtimeInterval periodtimeIntervalField;
   private TimeSeries timeSeriesField;
 
+  [XmlElement("mRID")]
   public string MRID
   {
     get
@@ -35,6 +36,7 @@ public partial class EntsoeDocument
     }
   }
 
+  [XmlElement("revisionNumber")]
   public byte RevisionNumber
   {
     get
@@ -47,6 +49,7 @@ public partial class EntsoeDocument
     }
   }
 
+  [XmlElement("type")]
   public string Type
   {
     get
@@ -111,6 +114,7 @@ public partial class EntsoeDocument
     }
   }
 
+  [XmlElement("createdDateTime")]
   public DateTime CreatedDateTime
   {
     get
@@ -136,6 +140,7 @@ public partial class EntsoeDocument
     }
   }
 
+  [XmlElement("TimeSeries")]
   public TimeSeries TimeSeries
   {
     get
@@ -151,7 +156,7 @@ public partial class EntsoeDocument
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class SenderMarketParticipantmRID
 {
   private string codingSchemeField;
@@ -186,7 +191,7 @@ public partial class SenderMarketParticipantmRID
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class ReceiverMarketParticipantmRID
 {
   private string codingSchemeField;
@@ -221,7 +226,7 @@ public partial class ReceiverMarketParticipantmRID
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class PeriodtimeInterval
 {
   private string startField;
@@ -254,7 +259,7 @@ public partial class PeriodtimeInterval
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class TimeSeries
 {
   private byte mRIDField;
@@ -369,7 +374,7 @@ public partial class TimeSeries
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class InDomainmRID
 {
   private string codingSchemeField;
@@ -404,7 +409,7 @@ public partial class InDomainmRID
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class OutDomainmRID
 {
   private string codingSchemeField;
@@ -439,7 +444,7 @@ public partial class OutDomainmRID
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class Period
 {
   private Interval timeIntervalField;
@@ -487,7 +492,7 @@ public partial class Period
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class Interval
 {
   private string startField;
@@ -520,7 +525,7 @@ public partial class Interval
 
 [Serializable]
 [DesignerCategory("code")]
-[XmlType(AnonymousType = true, Namespace = "StromPriserWidgetAPI.Models")]
+[XmlType(AnonymousType = true, Namespace = "urn:iec62325.351:tc57wg16:451-3:publicationdocument:7:0")]
 public partial class PeriodPoint
 {
   private byte positionField;

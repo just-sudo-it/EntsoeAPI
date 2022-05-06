@@ -3,6 +3,8 @@ namespace StromPriserWidgetAPI.WebAPI.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 
+using StromPriserWidgetAPI.WebAPI.Logging;
+
 public abstract class BaseController<TController> : ControllerBase
   where TController : BaseController<TController>
 {
@@ -10,15 +12,12 @@ public abstract class BaseController<TController> : ControllerBase
 
   protected ILogger<TController> Logger { get; }
 
-  //
   // Summary:
   //     Creates an Microsoft.AspNetCore.Mvc.BadRequestObjectResult that produces a Microsoft.AspNetCore.Http.StatusCodes.Status400BadRequest
   //     response.
-  //
   // Parameters:
   //   error:
   //     An error object to be returned to the client.
-  //
   // Returns:
   //     The created Microsoft.AspNetCore.Mvc.BadRequestObjectResult for the response.
   [NonAction]

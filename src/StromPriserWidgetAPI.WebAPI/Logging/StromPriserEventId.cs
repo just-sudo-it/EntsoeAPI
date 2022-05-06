@@ -1,8 +1,5 @@
 namespace StromPriserWidgetAPI.WebAPI.Logging;
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
-
 //
 // Summary:
 //     Event IDs for relational events that correspond to messages logged to an Microsoft.Extensions.Logging.ILogger
@@ -16,39 +13,30 @@ public static class StromPriserEventId
 {
   private enum Id
   {
-    ConnectionOpening = 20000,
-    ConnectionOpened = 20001,
+    General = 20000,
+    BackgroundService = 30000,
   }
 
-  private static readonly string _connectionPrefix = LoggerCategory<DbLoggerCategory.Database.Connection>.Name + ".";
-  private static readonly string _modelPrefix = LoggerCategory<DbLoggerCategory.Model>.Name + ".";
+  private static readonly string _generalPrefix = "[CORE]";
+  private static readonly string _backgroundServicePrefix = "[BACKGROUND_SERVICE]";
 
-  //
   // Summary:
   //     A database connection is opening.
   //     This event is in the Microsoft.EntityFrameworkCore.DbLoggerCategory.Database.Connection
   //     category.
   //     This event uses the Microsoft.EntityFrameworkCore.Diagnostics.ConnectionEventData
   //     payload when used with a System.Diagnostics.DiagnosticSource.
-  public static readonly EventId ConnectionOpening = MakeConnectionId(Id.ConnectionOpening);
+  public static readonly EventId General = MakeGeneralId(Id.General);
 
-  //
   // Summary:
   //     A database connection has been opened.
   //     This event is in the Microsoft.EntityFrameworkCore.DbLoggerCategory.Database.Connection
   //     category.
   //     This event uses the Microsoft.EntityFrameworkCore.Diagnostics.ConnectionEndEventData
   //     payload when used with a System.Diagnostics.DiagnosticSource.
-  public static readonly EventId ConnectionOpened = MakeCommandId(Id.ConnectionOpened);
+  public static readonly EventId BackgroundService = MakeBackgroundServiceId(Id.BackgroundService);
 
+  private static EventId MakeGeneralId(Id id) => new((int)id, _generalPrefix + id);
 
-  private static EventId MakeConnectionId(Id id)
-  {
-    return new EventId((int)id, _connectionPrefix + id);
-  }
-
-  private static EventId MakeCommandId(Id id)
-  {
-    return new EventId((int)id, _modelPrefix + id);
-  }
+  private static EventId MakeBackgroundServiceId(Id id) => new((int)id, _backgroundServicePrefix + id);
 }

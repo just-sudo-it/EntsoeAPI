@@ -20,8 +20,8 @@ public class ZonePrice : StromPriserEntity<long, ZonePrice>
       e =>
       {
         OnModelCreating(e);
-        //e.HasIndex("ProjectId", "VesselId").IsUnique();
-        //e.HasMany(x => x.Zones).WithOne(x => x.Assessment).IsRequired().OnDelete(DeleteBehavior.Restrict);
+        // e.HasIndex("ProjectId", "VesselId").IsUnique();
+        // e.HasMany(x => x.Zones).WithOne(x => x.Assessment).IsRequired().OnDelete(DeleteBehavior.Restrict);
       });
   }
 }
