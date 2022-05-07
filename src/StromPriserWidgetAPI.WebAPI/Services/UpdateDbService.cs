@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.WebUtilities;
 using StromPriserWidgetAPI.Data;
 using StromPriserWidgetAPI.Data.Entities;
 using StromPriserWidgetAPI.WebAPI.Logging;
+using System.Xml.Schema;
 
 [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Background services should not die")]
 public class UpdateDbService : BackgroundService
@@ -67,7 +68,6 @@ public class UpdateDbService : BackgroundService
       using var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
 
       // persistence code
-
     }
 
     return;
@@ -75,48 +75,59 @@ public class UpdateDbService : BackgroundService
 
   private async Task<EntsoeDocument?> GetPriceData(DateTime dateFrom, DateTime dateTo, string zone, CancellationToken cancellationToken)
   {
-    #region
-    // entso api key  "2dac08d6-4c38-4606-8791-c78de794b47d"
-    // entso root api path prod ->"https://transparency.entsoe.eu/api?periodStart=201601010000&periodEnd=201601020000 " dev->"https://iop-transparency.entsoe.eu/api?"
+
     using var client = httpFactory.CreateClient();
 
   /*  var prodBaseUri = "https://transparency.entsoe.eu/api" */
     var devBaseUri = "https://iop-transparency.entsoe.eu/api";
 
-    #endregion
     using var httpResponseMessage = await client.GetAsync(
-      GetRequestUri(
-        devBaseUri,
-        new Dictionary<string, string?>()
-        {
-          { "securityToken", "2dac08d6-4c38-4606-8791-c78de794b47d" }, // {Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")
-          { "periodStart", dateFrom.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
-          { "periodEnd", dateTo.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
-          { "documentType", "A44" },
-          { "in_Domain", zone },
-          { "out_Domain", zone },
-          { "processType", "A16" },
-          { "outBiddingZone_Domain", "10YCZ-CEPS-----N" },
-        }),
+      GetRequestUri(devBaseUri, new Dictionary<string, string?>()
+      {
+        { "securityToken", "2dac08d6-4c38-4606-8791-c78de794b47d" }, // {Environment.GetEnvironmentVariable("STROMPRISER_API_KEY")
+        { "periodStart", dateFrom.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
+        { "periodEnd", dateTo.ToString("yyyyMMddHHmm", CultureInfo.InvariantCulture) },
+        { "documentType", "A44" },
+        { "in_Domain", zone },
+        { "out_Domain", zone },
+        { "processType", "A16" },
+        { "outBiddingZone_Domain", "10YCZ-CEPS-----N" },
+      }),
       cancellationToken);
 
     Log.LogInfo(logger, $"{httpResponseMessage.StatusCode} /n {httpResponseMessage.ReasonPhrase}");
 
-    EntsoeDocument? data = null;
     if (httpResponseMessage.IsSuccessStatusCode)
     {
       using var inStream = await httpResponseMessage.Content.ReadAsStreamAsync(cancellationToken);
-      using var xmlReader = XmlReader.Create(inStream);
-      data = new XmlSerializer(typeof(EntsoeDocument))
-        .Deserialize(xmlReader) as EntsoeDocument;
+
+      var serializer = new XmlSerializer(typeof(EntsoeDocument));
+      serializer.UnknownNode += new XmlNodeEventHandler(UnknownNodeCallBack);
+      serializer.UnknownAttribute += new XmlAttributeEventHandler(UnknownAttributeCallBack);
+
+      var readerSettings = new XmlReaderSettings() { Async = true };
+      readerSettings.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+      using var xmlReader = XmlReader.Create(inStream, readerSettings);
+
+      var data = serializer.Deserialize(xmlReader) as EntsoeDocument;
+
+      return data;
     }
 
-    return data;
+    return null;
   }
 
-  // TODO  transfer to http-utility common class
   private static Uri GetRequestUri(string baseUri, IDictionary<string, string?>? @params = null)
   => @params is null
      ? new Uri(string.Empty)
      : new Uri(QueryHelpers.AddQueryString(baseUri, @params));
+
+  private void ValidationCallBack(object? sender, ValidationEventArgs args)
+    => Log.SerializerError(logger, "Xml validation error:" + args.Message);
+
+  private void UnknownNodeCallBack(object? sender, XmlNodeEventArgs e)
+    => Log.SerializerError(logger, "Unknown Node:" + e.Name + "\t" + e.Text);
+
+  private void UnknownAttributeCallBack(object? sender, XmlAttributeEventArgs e)
+    => Log.SerializerError(logger, "Unknown attribute " + e.Attr.Name + "='" + e.Attr.Value + "'");
 }

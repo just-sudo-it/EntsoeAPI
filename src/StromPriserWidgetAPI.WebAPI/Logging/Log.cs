@@ -20,4 +20,6 @@ public static partial class Log
   [LoggerMessage(EventId = 6, Level = LogLevel.Debug, Message = "`{info}`)")]
   public static partial void LogInfo(ILogger logger, string info);
 
+  [LoggerMessage(EventId = 7, Level = LogLevel.Debug, Message = "Serialization Error : `{info}`)")]
+  public static partial void SerializerError(ILogger logger, string info);
 }
