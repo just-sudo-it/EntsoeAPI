@@ -6,9 +6,9 @@ namespace StromPriserWidgetAPI.Data
 
   public class DataContext : DbContext
   {
-    public DbSet<string> Zones { get; set; }
+    public DbSet<Zone> Zones { get; set; } = null!;
 
-    public DbSet<string> Prices { get; set; }
+    public DbSet<ZonePrice> Prices { get; set; } = null!;
 
     public DataContext(DbContextOptions options)
       : base(options)
@@ -21,6 +21,7 @@ namespace StromPriserWidgetAPI.Data
       base.OnModelCreating(builder);
 
       Zone.OnModelCreating(builder);
-      ImportTaskEntry.OnModelCreating(builder);
+      ZonePrice.OnModelCreating(builder);
     }
+  }
 }
